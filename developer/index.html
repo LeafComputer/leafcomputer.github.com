@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon-precomposed" href="icon.png"/>
 	<link rel="stylesheet" href="main.css" type="text/css"/>
 	<script src="sjcl.js"></script>
+	<script src="filedropper.js"></script>
 	<script src="socket.io.js"></script>
 	<script>
 	ChatServerAddress = "http://leafdev.hp.af.cm/";
@@ -34,6 +35,25 @@
 		document.getElementById("Connect").style.pointerEvents = "none";
 		Chat.style.opacity = "1";
 		msgcomposer.disabled = false;
+			dnd = new DnDFileController('body', function(files) {
+				if(confirm("Are you sure you want to send this(these) file(s)?"))
+				{
+    			for (var i = 0, f; f = files[i]; i++) {
+						
+     					 var reader = new FileReader();
+						
+     					 // Closure to capture the file information.
+      					reader.onload = (function(theFile) {
+        				return function(e) {
+          				socket.emit("file", {name: sjcl.encrypt(Password.value, theFile.name), content: sjcl.encrypt(Password.value,e.target.result) });
+        				};
+     				 	})(f);
+
+     					 // Read the file as a data URL.
+      				reader.readAsDataURL(f);
+      				}
+      			}
+	  			});
 	});
 	
 	socket.on('LoginError', function () {
@@ -75,6 +95,36 @@
 	ScrollToBottom();
 	});
 	}
+	
+	socket.on('file', function (message) {
+	//Load message
+	console.log(message.message);
+	TheRow = document.createElement("tr");
+	document.getElementById("messages").appendChild(TheRow);
+	TheTime = document.createElement("td");
+	TheTime.innerText = message.time;
+	TheTime.className = "Date";
+	TheRow.appendChild(TheTime);
+	TheSender = document.createElement("td");
+	TheSender.innerText = message.from;
+	TheSender.className = "Sender";
+	TheRow.appendChild(TheSender);
+	TheMessage = document.createElement("td");
+	try
+	{
+		TheLinkToFile = document.createElement("a");
+		TheLinkToFile.innerText = sjcl.decrypt(Password.value,message.name);
+		TheLinkToFile.href = sjcl.decrypt(Password.value,message.content);
+		TheMessage.appendChild(TheLinkToFile);
+	}
+	catch(err)
+	{
+			TheMessage.innerText = "(File encrypted with different password)";
+	}
+	TheMessage.className = "LaMensaje";
+	TheRow.appendChild(TheMessage);
+	ScrollToBottom();
+	});
 
 	
 	
