@@ -38,13 +38,17 @@
 			dnd = new DnDFileController('body', function(files) {
 				if(confirm("Are you sure you want to send this(these) file(s)?"))
 				{
+				console.log("Accepted to send the files");
     			for (var i = 0, f; f = files[i]; i++) {
+    			console.log("ooh, a file, how fancy!")
 						
      					 var reader = new FileReader();
 						
      					 // Closure to capture the file information.
       					reader.onload = (function(theFile) {
+      					console.log("hmm, this might work...")
         				return function(e) {
+        				console.log("Well, it should send to server...")
           				socket.emit("file", {name: sjcl.encrypt(Password.value, theFile.name), content: sjcl.encrypt(Password.value,e.target.result) });
         				};
      				 	})(f);
@@ -97,6 +101,7 @@
 	}
 	
 	socket.on('file', function (message) {
+	console.log("Got an incoming file!")
 	//Load message
 	console.log(message.message);
 	TheRow = document.createElement("tr");
