@@ -162,7 +162,7 @@ background:#ddd;
 .UploadFile{
 	float:right;
 	height:3cm;
-	background-color:#aaa;
+	background-color:#ccc;
 	color:#fff;
 	font-family:Geo;
 	font-size:28;
@@ -182,7 +182,7 @@ background:#ddd;
 -moz-transition:all 1.5s;
 -o-transition:all 1.5s;
 -ms-transition:all 1.5s;
-color:#aaa;
+color:#fff;
 border:none;
 background:none;
 font-family:Geo;
