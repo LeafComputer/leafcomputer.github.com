@@ -1,63 +1,52 @@
+
+
 importScripts('sjcl.js');
 
 
-var key = null;
-var plainChunk = null;
-var cryptChunk = null;
+password = "";
+plainFile = "";
+cryptFile = "";
 
-
-/** Input from my master
- *
- */
 self.onmessage = function(event) {
-    debug("message received");
-    plainChunk = event.data['data'] || null;
-    key = event.data['password'] || null;
+    plainFile = event.data['data'] || undefined;
+    password = event.data['password'] || undefined;
 
-    if (typeof(plainChunk) != "string" || (plainChunk.length = 0)) {
-        error("empty data received");
-        return;
-    };
+	if(plainFile == "")
+	{
+		Err("empty data received");
+	}
 
-    if (typeof(key) != "string" || (key.length = 0)) {
-        error("empty key received");
-        return;
-    };
+    if (typeof(plainFile) != "string" || plainFile == "")
+    {
+        Err("File Data must be binary string!");
+    }
 
-    doCrypt();
+    if (typeof(password) != "string")
+    {
+        Err("Password must be a string");
+    }
+
+    EncryptTheFile();
 };
 
+function Err(e) {
+    postMessage({'status': 'error', 'message':e});
+}
 
-/** Start encryption
- *
- */
-function doCrypt() {
-    try {
-        debug("starting encryption");
-        cryptChunk = sjcl.encrypt(key, plainChunk);
-        debug("encryption finished");
-    } catch(e) {
-        error("can't crypt: " + e.toString());
-        return;
-    };
-    done();
-};
-
-
-/** Called when encryption is finished
- *
- */
-function done() {
-    debug("returning data");
-    postMessage({'status': 'ok', 'data':cryptChunk});
-    debug("data was returned");
+function MakeLog(e) {
+    postMessage({'status': 'MakeLog', 'message':e});
 }
 
 
-function error(e) {
-    postMessage({'status': 'error', 'message':e});
-};
-
-function debug(e) {
-    postMessage({'status': 'debug', 'message':e});
-};
+function EncryptTheFile() {
+    try {
+        MakeLog("starting to encrypt file...");
+        cryptFile = sjcl.encrypt(password, plainFile);
+        MakeLog("encryption done!!");
+    	postMessage({'status': 'ok', 'data':cryptFile});
+    	MakeLog("File sent from worker to main script");
+    } catch(err) {
+        Err("Error on encryption: " + err.toString());
+        return true;
+    }
+}
