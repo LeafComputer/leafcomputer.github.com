@@ -205,18 +205,18 @@
 		this.reader = new FileReader();
 		
 		//Set the HTML tags
-		this.UploadBox = document.CreateElement("div");
+		this.UploadBox = document.createElement("div");
 		this.UploadBox.className = "UploadFile";
 		UploadFilesContainer.appendChild(this.UploadBox);
-		this.UploadBox.TheTitle = document.CreateElement("div");
+		this.UploadBox.TheTitle = document.createElement("div");
 		this.UploadBox.appendChild(this.UploadBox.TheTitle);
-		this.UploadBox.TheStatus = document.CreateElement("div");
+		this.UploadBox.TheStatus = document.createElement("div");
 		this.UploadBox.appendChild(this.UploadBox.TheStatus);
-		this.UploadBox.TheProgress = document.CreateElement("progress");
+		this.UploadBox.TheProgress = document.createElement("progress");
 		this.UploadBox.TheProgress.max = "100";
 		this.UploadBox.TheProgress.value = "0";
 		this.UploadBox.appendChild(this.UploadBox.TheProgress);
-		this.UploadBox.TheCancelButton = document.CreateElement("button");
+		this.UploadBox.TheCancelButton = document.createElement("button");
 		this.UploadBox.TheCancelButton.className = "FileUploadBtn";
 		this.UploadBox.TheCancelButton.innerText = "Cancel";
 		this.UploadBox.appendChild(this.UploadBox.TheCancelButton);
