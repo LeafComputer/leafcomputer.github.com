@@ -202,7 +202,6 @@
 	
 	function FileToUpload(f)
 	{
-		var that = this;
 		this.reader = new FileReader();
 		
 		//Set the HTML tags
@@ -225,36 +224,42 @@
 		this.File = f;
 		this.EncryptedFile = "";
 		
+		
+		//link stuff
+		this.reader.UploadBox = this.UploadBox;
+		this.reader.File = this.File;
+		this.UploadBox.TheCancelButton.reader = this.reader;
+		this.reader.EncryptedFile = this.EncryptedFile;
+		
      					 this.reader.onerror = function(){
      					 	//Display error
-     					 	console.log("There was an error on reading file...");
      					 };
      					 
      					 this.UploadBox.TheCancelButton.onclick = function()
 						{
-							that.reader.abort();	
+							this.reader.abort();	
 						}
      					 
-    					 this.reader.onprogress = function(evt){
+    					 this.reader.onprogress = function(){
     					 if (evt.lengthComputable) {
 							var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-								that.UploadBox.TheProgress.value = percentLoaded;
+								this.UploadBox.TheProgress.value = percentLoaded;
 							}
     					 	
     					 };
     					 
     					 this.reader.onabort = function(e) {
       					 console.log('File read cancelled');
-      					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
-      					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
-      					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
-      					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
-      					 UploadFilesContainer.removeChild(that.UploadBox);
+      					 this.UploadBox.removeChild(this.UploadBox.TheCancelButton);
+      					 this.UploadBox.removeChild(this.UploadBox.TheProgress);
+      					 this.UploadBox.removeChild(this.UploadBox.TheStatus);
+      					 this.UploadBox.removeChild(this.UploadBox.TheTitle);
+      					 UploadFilesContainer.removeChild(this.UploadBox);
     					 };
     					 
     					 this.reader.onloadstart = function(e) {
-      					 that.UploadBox.TheTitle.innerText = that.File.name;
-      					 that.UploadBox.TheStatus.innerText = "Loading file...";
+      					 this.UploadBox.TheTitle.innerText = this.File.name;
+      					 this.UploadBox.TheStatus.innerText = "Loading file...";
     					 };
     					 
     					 
@@ -265,25 +270,14 @@
         				return function(e) {
         				console.log("Well, it should send to server...")
           				//encrypt, then send to server.
-          				that.Worker = new Worker('EncryptFile.js');
-          				that.Worker.addEventListener('message', function(e) {
+          				this.Worker = new Worker('EncryptFile.js');
+          				this.Worker.addEventListener('message', function(e) {
     						//send e to server
     						//socket.emit
-    						if(e.data['status'] == "ok")
-    						{
-    						that.EncryptedFile = e.data['data'];
+    						this.EncryptedFile = e;
     						console.log(e);
-    						}
-    						else if(e.data['status'] == "debug")
-    						{
-    						 console.log("File encrypt debug:" + e.data['message']);
-    						}
-    						else if(e.data['status'] == "error")
-    						{
-    						console.log("Error on file encryption, here's message: " + e.data['message']);
-    						}
 						}, false);
-						that.Worker.postMessage({password: Password.value, data: e.target.result, cmd: "encrypt"});
+						this.Worker.postMessage({password: Password.value, data: e.target.result, cmd: "encrypt"});
           				//this.EncryptedFile = sjcl.encrypt(Password.value, e.target.result)
         				};
      				 	})(f);
