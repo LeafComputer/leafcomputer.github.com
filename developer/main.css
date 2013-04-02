@@ -147,18 +147,49 @@ z-index:75;
 
 #msgcomposer:active
 {
-position:fixed;
-width:100%;
-height:2cm;
-bottom:0px;
-z-index:50;
--webkit-appearance:none;
-border:none;
 background:#ddd;
-font-family:Geo;
-font-size:32;
+}
+
+#UploadFilesContainer{
+	position:fixed;
+	top:0px;
+	right:0px;
+	width:5cm;
+	max-height:-webkit-calc(100% - 2cm);
+	-webkit-overflow-scrolling: touch;
+}
+
+.UploadFile{
+	float:right;
+	height:3cm;
+	background-color:#aaa;
+	color:#fff;
+	font-family:Geo;
+	font-size:28;
+	margin:10px;
+}
+
+.FileUploadBtn{
+-webkit-user-select:none;
+-moz-user-select:none;
+-o-user-select:none;
+-ms-user-select:none;
+-webkit-appearance:none;
+-moz-appearance:none;
+-o-appearance:none;
+-ms-appearance:none;
+-webkit-transition:all 1.5s;
+-moz-transition:all 1.5s;
+-o-transition:all 1.5s;
+-ms-transition:all 1.5s;
 color:#aaa;
+border:none;
+background:none;
+font-family:Geo;
+font-size:36;
+position:fixed;
 outline:none;
+
 }
 
 .Date{

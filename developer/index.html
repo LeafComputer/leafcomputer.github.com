@@ -14,6 +14,7 @@
 	ChatServerAddress = "http://leafdev.hp.af.cm/";
 	ontitle = false;
 	hasFocus = false;
+	FilesToUpload = new Array();
 	
 	function Connect(name)
 	{
@@ -35,26 +36,16 @@
 		document.getElementById("Connect").style.pointerEvents = "none";
 		Chat.style.opacity = "1";
 		msgcomposer.disabled = false;
-			dnd = new DnDFileController('body', function(files) {
+		dnd = new DnDFileController('body', function(files) {
 				if(confirm("Are you sure you want to send this(these) file(s)?"))
 				{
 				console.log("Accepted to send the files");
     			for (var i = 0, f; f = files[i]; i++) {
     			console.log("ooh, a file, how fancy!")
 						
-     					 var reader = new FileReader();
+						FilesToUpload.push(new FileToUpload(f));
 						
-     					 // Closure to capture the file information.
-      					reader.onload = (function(theFile) {
-      					console.log("hmm, this might work...")
-        				return function(e) {
-        				console.log("Well, it should send to server...")
-          				socket.emit("file", {name: sjcl.encrypt(Password.value, theFile.name), content: sjcl.encrypt(Password.value,e.target.result) });
-        				};
-     				 	})(f);
-
-     					 // Read the file as a data URL.
-      				reader.readAsDataURL(f);
+      				
       				}
       			}
 	  			});
@@ -98,7 +89,6 @@
 	TheRow.appendChild(TheMessage);
 	ScrollToBottom();
 	});
-	}
 	
 	socket.on('file', function (message) {
 	console.log("Got an incoming file!")
@@ -130,6 +120,9 @@
 	TheRow.appendChild(TheMessage);
 	ScrollToBottom();
 	});
+	
+	}
+	
 
 	
 	
@@ -207,6 +200,92 @@
 	}
 	}
 	
+	function FileToUpload(f)
+	{
+		this.reader = new FileReader();
+		
+		//Set the HTML tags
+		this.UploadBox = document.CreateElement("div");
+		this.UploadBox.className = "UploadFile";
+		UploadFilesContainer.appendChild(this.UploadBox);
+		this.UploadBox.TheTitle = document.CreateElement("div");
+		this.UploadBox.appendChild(this.UploadBox.TheTitle);
+		this.UploadBox.TheStatus = document.CreateElement("div");
+		this.UploadBox.appendChild(this.UploadBox.TheStatus);
+		this.UploadBox.TheProgress = document.CreateElement("progress");
+		this.UploadBox.TheProgress.max = "100";
+		this.UploadBox.TheProgress.value = "0";
+		this.UploadBox.appendChild(this.UploadBox.TheProgress);
+		this.UploadBox.TheCancelButton = document.CreateElement("button");
+		this.UploadBox.TheCancelButton.className = "FileUploadBtn";
+		this.UploadBox.TheCancelButton.innerText = "Cancel";
+		this.UploadBox.appendChild(this.UploadBox.TheCancelButton);
+		
+		this.File = f;
+		this.EncryptedFile = "";
+		
+		
+		//link stuff
+		this.reader.UploadBox = this.UploadBox;
+		this.reader.File = this.File;
+		this.UploadBox.TheCancelButton.reader = this.reader;
+		this.reader.EncryptedFile = this.EncryptedFile;
+		
+     					 this.reader.onerror = function(){
+     					 	//Display error
+     					 };
+     					 
+     					 this.UploadBox.TheCancelButton.onclick = function()
+						{
+							this.reader.abort();	
+						}
+     					 
+    					 this.reader.onprogress = function(){
+    					 if (evt.lengthComputable) {
+							var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+								this.UploadBox.TheProgress.value = percentLoaded;
+							}
+    					 	
+    					 };
+    					 
+    					 this.reader.onabort = function(e) {
+      					 console.log('File read cancelled');
+      					 this.UploadBox.removeChild(this.UploadBox.TheCancelButton);
+      					 this.UploadBox.removeChild(this.UploadBox.TheProgress);
+      					 this.UploadBox.removeChild(this.UploadBox.TheStatus);
+      					 this.UploadBox.removeChild(this.UploadBox.TheTitle);
+      					 UploadFilesContainer.removeChild(this.UploadBox);
+    					 };
+    					 
+    					 this.reader.onloadstart = function(e) {
+      					 this.UploadBox.TheTitle.innerText = this.File.name;
+      					 this.UploadBox.TheStatus.innerText = "Loading file...";
+    					 };
+    					 
+    					 
+						
+     					 // Closure to capture the file information.
+      					this.reader.onload = (function(theFile) {
+      					console.log("hmm, this might work...")
+        				return function(e) {
+        				console.log("Well, it should send to server...")
+          				//encrypt, then send to server.
+          				this.Worker = new Worker('EncryptFile.js');
+          				this.Worker.addEventListener('message', function(e) {
+    						//send e to server
+    						//socket.emit
+    						this.EncryptedFile = e;
+    						console.log(e);
+						}, false);
+						this.Worker.postMessage({password: Password.value, data: e.target.result, cmd: "encrypt"});
+          				//this.EncryptedFile = sjcl.encrypt(Password.value, e.target.result)
+        				};
+     				 	})(f);
+
+     					 // Read the file as a data URL.
+      				reader.readAsBinaryString(f);
+	}
+	
 	function ShowElement(which)
 	{
 	if(which == "password")
@@ -281,6 +360,9 @@
 		</table>
 		</div>
 		<input placeholder="Type the Message here..." id="msgcomposer" type="search" onsearch="socket.emit('msg', sjcl.encrypt(Password.value, this.value));this.value = '';this.focus();ScrollToBottom();">
+	</div>
+	<div id="UploadFilesContainer">
+		
 	</div>
 </body>
 </html>
