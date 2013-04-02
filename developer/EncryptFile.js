@@ -4,29 +4,35 @@ importScripts('sjcl.js');
 
 
 password = "";
-plainFile = "";
-cryptFile = "";
+inputFile = "";
+outputFile = "";
 
 self.onmessage = function(event) {
-    plainFile = event.data['data'] || undefined;
+    inputFile = event.data['data'] || undefined;
     password = event.data['password'] || undefined;
 
-	if(plainFile == "")
+	if(inputFile == "")
 	{
 		Err("empty data received");
 	}
 
-    if (typeof(plainFile) != "string" || plainFile == "")
+    if (typeof(inputFile) != "string" || inputFile == "")
     {
-        Err("File Data must be binary string!");
+        Err("File Data must be binary string! (and an encrypted string in case of decryption)");
     }
 
     if (typeof(password) != "string")
     {
         Err("Password must be a string");
     }
-
-    EncryptTheFile();
+	if(event.data['cmd'] == "encrypt")
+	{
+    	EncryptTheFile();
+    }
+    else
+    {
+    	DecryptTheFile();
+    }
 };
 
 function Err(e) {
@@ -34,19 +40,32 @@ function Err(e) {
 }
 
 function MakeLog(e) {
-    postMessage({'status': 'MakeLog', 'message':e});
+    postMessage({'status': 'debug', 'message':e});
 }
 
 
 function EncryptTheFile() {
     try {
         MakeLog("starting to encrypt file...");
-        cryptFile = sjcl.encrypt(password, plainFile);
+        outputFile = sjcl.encrypt(password, inputFile);
         MakeLog("encryption done!!");
-    	postMessage({'status': 'ok', 'data':cryptFile});
+    	postMessage({'status': 'ok', 'data':outputFile});
     	MakeLog("File sent from worker to main script");
     } catch(err) {
         Err("Error on encryption: " + err.toString());
+        return true;
+    }
+}
+
+function DecryptTheFile() {
+    try {
+        MakeLog("starting to decrypt file...");
+        outputFile = sjcl.decrypt(password, inputFile);
+        MakeLog("decryption done!!");
+    	postMessage({'status': 'ok', 'data':outputFile});
+    	MakeLog("File sent from worker to main script");
+    } catch(err) {
+        Err("Error on decryption: " + err.toString());
         return true;
     }
 }
