@@ -15,6 +15,9 @@
 	ontitle = false;
 	hasFocus = false;
 	FilesToUpload = new Array();
+	FilesToDownload = new Array();
+	nextid = -1;
+	FSIDCallbacks = new Array();
 	
 	function Connect(name)
 	{
@@ -76,13 +79,21 @@
 	}
 	catch(err)
 	{
-		if(message.from == "Server")
+		if(message.isFile)
 		{
-			TheMessage.innerText = message.message;
+			//It is a file
+			TheMessage.innerHTML = message.message;
 		}
 		else
 		{
-			TheMessage.innerText = "(Message encrypted with different password)";
+			if(message.from == "Server")
+			{
+				TheMessage.innerText = message.message;
+			}
+			else
+			{
+				TheMessage.innerText = "(Message encrypted with different password)";
+			}
 		}
 	}
 	TheMessage.className = "LaMensaje";
@@ -90,35 +101,17 @@
 	ScrollToBottom();
 	});
 	
-	socket.on('file', function (message) {
-	console.log("Got an incoming file!")
-	//Load message
-	console.log(message.message);
-	TheRow = document.createElement("tr");
-	document.getElementById("messages").appendChild(TheRow);
-	TheTime = document.createElement("td");
-	TheTime.innerText = message.time;
-	TheTime.className = "Date";
-	TheRow.appendChild(TheTime);
-	TheSender = document.createElement("td");
-	TheSender.innerText = message.from;
-	TheSender.className = "Sender";
-	TheRow.appendChild(TheSender);
-	TheMessage = document.createElement("td");
-	try
-	{
-		TheLinkToFile = document.createElement("a");
-		TheLinkToFile.innerText = sjcl.decrypt(Password.value,message.name);
-		TheLinkToFile.href = sjcl.decrypt(Password.value,message.content);
-		TheMessage.appendChild(TheLinkToFile);
-	}
-	catch(err)
-	{
-			TheMessage.innerText = "(File encrypted with different password)";
-	}
-	TheMessage.className = "LaMensaje";
-	TheRow.appendChild(TheMessage);
-	ScrollToBottom();
+	socket.on("Chunk", function(TheData){
+		if(TheData.data != "")
+		{
+			FSIDRedirect(TheData.Fid).data += TheData.data;
+			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.Downloaded})
+		}
+		else
+		{
+			//Dowload Complete
+			FSIDRedirect(Data.Fid).Conclude();
+		}
 	});
 	
 	}
@@ -200,8 +193,73 @@
 	}
 	}
 	
+	function DownloadFile(WhichSid)
+	{
+	
+		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length]),downloaded:0});
+		var newFTD = FilesToDownload[FilesToDownload.length];
+		newFTD.data = "";
+		newFTD.Worker = new Worker();
+		newFTD.Fdata = "";
+		newFTD.conclude = function(){
+		
+		var Place = 0;
+		newFTD.Worker = new Worker('EncryptFile.js');
+          				newFTD.Worker.addEventListener('message', function(e) {
+
+    						if(e.data['status'] == "debug")
+    						{
+    						 console.log("File decrypt debug:" + e.data['message']);
+    						}
+    						else if(e.data['status'] == "error")
+    						{
+    						console.log("Error on file decryption, here's message: " + e.data['message']);
+    						}
+    						else if(e.data['status'] == "begin")
+    						{
+    							newFTD.Worker.PostMessage({cmd: "more data"});
+    						}
+    						else if(e.data['status'] == "CryptChunk")
+    						{
+    							if(e.data['data'] != "")
+    							{
+    							newFTD.Fdata += e.data['data'];
+    							newFTD.Worker.PostMessage({cmd: "more data"});
+    							}
+    							else
+    							{
+    							console.log("It's decrypted!!");
+    							console.log("glory: " + newFTD.Fdata);
+    							}
+    						}
+    						else if(e.data['status'] == "more data")
+    						{
+    							newFTD.Worker.PostMessage({cmd: "Chunk", data: newFTD.data.substring(Place*100000,(Place+1)*100000)});
+    							Place++;
+    						}
+						}, false);
+						newFTD.Worker.postMessage({password: Password.value, cmd: "decrypt"});
+						
+						
+		}
+		
+	}
+	
+	function FSIDRedirect(whichFSID)
+	{
+		return FSIDCallbacks[whichFSID];
+	}
+	
+	function NewFSID(callback)
+	{
+		nextid++;
+		FSIDCallbacks[nextid] = callback;
+		return nextid;
+	}
+	
 	function FileToUpload(f)
 	{
+		this.Fid = NewFSID();
 		var that = this;
 		this.reader = new FileReader();
 		
@@ -224,6 +282,8 @@
 		
 		this.File = f;
 		this.EncryptedFile = "";
+		//Place to send to worker...
+		var Place = 0;
 		
      					 this.reader.onerror = function(){
      					 	//Display error
@@ -261,6 +321,7 @@
 						
      					 // Closure to capture the file information.
       					this.reader.onload = (function(theFile) {
+      					that.UploadBox.TheStatus.innerText = "Encrypting...";
       					console.log("hmm, this might work...")
         				return function(e) {
         				console.log("Well, it should send to server...")
@@ -282,8 +343,32 @@
     						{
     						console.log("Error on file encryption, here's message: " + e.data['message']);
     						}
+    						else if(e.data['status'] == "begin")
+    						{
+    							that.UploadBox.TheStatus.innerText = "Sending...";
+    							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name});
+    							that.Worker.PostMessage({cmd: "more data"});
+    						}
+    						else if(e.data['status'] == "CryptChunk")
+    						{
+    							if(e.data['data'] != "")
+    							{
+    							//that.EncryptedFile += e.data['data'];
+    							socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']})
+    							that.Worker.PostMessage({cmd: "more data"});
+    							}
+    							else
+    							{
+    							console.log("It's encrypted!!");
+    							}
+    						}
+    						else if(e.data['status'] == "more data")
+    						{
+    							that.Worker.PostMessage({cmd: "Chunk", data: e.target.result.substring(Place*100000,(Place+1)*100000)});
+    							Place++;
+    						}
 						}, false);
-						that.Worker.postMessage({password: Password.value, data: e.target.result, cmd: "encrypt"});
+						that.Worker.postMessage({password: Password.value, cmd: "encrypt"});
           				//this.EncryptedFile = sjcl.encrypt(Password.value, e.target.result)
         				};
      				 	})(f);
