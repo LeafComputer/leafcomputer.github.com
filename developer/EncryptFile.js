@@ -23,10 +23,12 @@ self.onmessage = function(event) {
 	if(event.data['cmd'] == "encrypt")
 	{
     	toEncrypt = true;
+    	MakeLog("Going to encrypt soon...");
     }
     else
     {
     	toEncrypt = false;
+    	MakeLog("Going to decrypt soon...");
     }
     postMessage({'status': 'more data'});
     }
