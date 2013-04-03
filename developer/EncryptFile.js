@@ -28,6 +28,7 @@ self.onmessage = function(event) {
     {
     	toEncrypt = false;
     }
+    postMessage({'status': 'more data'});
     }
     else if(event.data['cmd'] == "more data")
     {
