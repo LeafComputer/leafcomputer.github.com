@@ -364,7 +364,7 @@
     						}
     						else if(e.data['status'] == "more data")
     						{
-    							that.Worker.PostMessage({cmd: "Chunk", data: e.target.result.substring(Place*100000,(Place+1)*100000)});
+    							that.Worker.PostMessage({cmd: "Chunk", data: that.reader.result.substring(Place*100000,(Place+1)*100000)});
     							Place++;
     						}
 						}, false);
