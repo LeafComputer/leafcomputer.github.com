@@ -102,6 +102,7 @@
 	});
 	
 	socket.on("Chunk", function(TheData){
+		console.log(TheData);
 		if(TheData.data != "")
 		{
 			FSIDRedirect(TheData.Fid).data += TheData.data;
