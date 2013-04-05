@@ -312,6 +312,17 @@
       					 UploadFilesContainer.removeChild(that.UploadBox);
     					 };
     					 
+    					 this.AllDone = function() {
+    					 console.log('Deleting File Upload object...');
+    					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
+      					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
+      					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
+      					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
+      					 UploadFilesContainer.removeChild(that.UploadBox);
+      					 that = null;
+      					 console.log("File Upload object deleted");
+    					 }
+    					 
     					 this.reader.onloadstart = function(e) {
       					 that.UploadBox.TheTitle.innerText = that.File.name;
       					 that.UploadBox.TheStatus.innerText = "Loading file...";
@@ -362,6 +373,7 @@
     							//Send one last chunk (empty), so server knows that file is finished transferring...
     							socket.emit("Chunk",{Fid: that.Fid, data: ""})
     							console.log("It's encrypted!!");
+    							that.AllDone();
     							}
     						}
     						else if(e.data['status'] == "more data")
