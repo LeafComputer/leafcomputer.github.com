@@ -197,7 +197,8 @@
 	function DownloadFile(WhichSid)
 	{
 		var newFTD = FilesToDownload[FilesToDownload.length] = new Object();
-		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0});
+		console.log(newFTD);
+		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
 		newFTD.Fdata = "";
 		newFTD.conclude = function(){
