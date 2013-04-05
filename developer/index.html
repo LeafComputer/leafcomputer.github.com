@@ -199,7 +199,6 @@
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length]),downloaded:0});
 		var newFTD = FilesToDownload[FilesToDownload.length] = new Object();
 		newFTD.data = "";
-		newFTD.Worker = new Worker();
 		newFTD.Fdata = "";
 		newFTD.conclude = function(){
 		
