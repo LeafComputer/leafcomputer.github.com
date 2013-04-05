@@ -359,6 +359,8 @@
     							}
     							else
     							{
+    							//Send one last chunk (empty), so server knows that file is finished transferring...
+    							socket.emit("Chunk",{Fid: that.Fid, data: ""})
     							console.log("It's encrypted!!");
     							}
     						}
