@@ -115,6 +115,10 @@
 		}
 	});
 	
+		socket.on("more data", function(TheFid){
+		FSIDRedirect(TheFid).SendBuffer();
+	});
+	
 	}
 	
 
@@ -259,7 +263,7 @@
 	
 	function FileToUpload(f)
 	{
-		this.Fid = NewFSID();
+		this.Fid = NewFSID(this);
 		var that = this;
 		this.reader = new FileReader();
 		
@@ -281,7 +285,7 @@
 		this.UploadBox.appendChild(this.UploadBox.TheCancelButton);
 		
 		this.File = f;
-		this.EncryptedFile = "";
+		this.EncryptedFile = new Array();
 		//Place to send to worker...
 		var Place = 0;
 		
@@ -328,6 +332,16 @@
       					 that.UploadBox.TheStatus.innerText = "Loading file...";
     					 };
     					 
+    					 this.SendBuffer = function()
+    					 {
+    					 	socket.emit("Chunk",{Fid: that.Fid, data: that.EncryptedFile[0]});
+    					 	if(that.EncryptedFile[0] == "")
+    					 	{
+    					 	that.AllDone();
+    					 	}
+    					 	that.splice(0,1);
+    					 }
+    					 
     					 
 						
      					 // Closure to capture the file information.
@@ -365,15 +379,16 @@
     							if(e.data['data'] != "")
     							{
     							//that.EncryptedFile += e.data['data'];
-    							socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']})
+    							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
+    							that.EncryptedFile.push(e.data['data']);
     							that.Worker.postMessage({cmd: "more data"});
     							}
     							else
     							{
     							//Send one last chunk (empty), so server knows that file is finished transferring...
-    							socket.emit("Chunk",{Fid: that.Fid, data: ""})
+    							//socket.emit("Chunk",{Fid: that.Fid, data: ""})
+    							that.EncryptedFile.push(e.data['data']);
     							console.log("It's encrypted!!");
-    							that.AllDone();
     							}
     						}
     						else if(e.data['status'] == "more data")
