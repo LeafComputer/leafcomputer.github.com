@@ -116,6 +116,7 @@
 	});
 	
 		socket.on("more data", function(TheFid){
+		console.log("Server is requesting more chunks of file");
 		FSIDRedirect(TheFid).SendBuffer();
 	});
 	
@@ -373,6 +374,7 @@
     						{
     							that.UploadBox.TheStatus.innerText = "Sending...";
     							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name});
+    							console.log("It began getting encrypted file from worker and uploading to server process");
     							that.Worker.postMessage({cmd: "more data"});
     						}
     						else if(e.data['status'] == "CryptChunk")
