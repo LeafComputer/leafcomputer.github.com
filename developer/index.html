@@ -335,6 +335,7 @@
     					 this.SendBuffer = function()
     					 {
     					 	socket.emit("Chunk",{Fid: that.Fid, data: that.EncryptedFile[0]});
+    					 	console.log("Sent a chunk of file to server...");
     					 	if(that.EncryptedFile[0] == "")
     					 	{
     					 	that.AllDone();
@@ -381,6 +382,7 @@
     							//that.EncryptedFile += e.data['data'];
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
     							that.EncryptedFile.push(e.data['data']);
+    							console.log("Received Encrypted chunk from worker");
     							that.Worker.postMessage({cmd: "more data"});
     							}
     							else
