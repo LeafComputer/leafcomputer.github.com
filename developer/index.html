@@ -19,11 +19,25 @@
 	FilesToDownload = new Array();
 	nextid = -1;
 	FSIDCallbacks = new Array();
+	DebugMode = false;
+	
+	function Debug(message)
+	{
+	if(DebugMode == true)
+	{
+		console.log(message);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	}
 	
 	function Connect(name)
 	{
 	socket = io.connect(ChatServerAddress);
-	console.log(socket);
+	Debug(socket);
 	socket.emit('set user', name);
 	
 	socket.on('SuccessfulLogin', function () {
@@ -43,9 +57,9 @@
 		dnd = new DnDFileController('body', function(files) {
 				if(confirm("Are you sure you want to send this(these) file(s)?"))
 				{
-				console.log("Accepted to send the files");
+				Debug("Accepted to send the files");
     			for (var i = 0, f; f = files[i]; i++) {
-    			console.log("ooh, a file, how fancy!")
+    			Debug("ooh, a file, how fancy!")
 						
 						FilesToUpload.push(new FileToUpload(f));
 						
@@ -62,7 +76,7 @@
 	
 	socket.on('msg', function (message) {
 	//Load message
-	console.log(message.message);
+	Debug(message.message);
 	TheRow = document.createElement("tr");
 	document.getElementById("messages").appendChild(TheRow);
 	TheTime = document.createElement("td");
@@ -103,7 +117,7 @@
 	});
 	
 	socket.on("Chunk", function(TheData){
-		console.log(TheData);
+		Debug(TheData);
 		if(TheData.data != "")
 		{
 			FSIDRedirect(TheData.Fid).data += TheData.data;
@@ -117,7 +131,7 @@
 	});
 	
 		socket.on("more data", function(TheFid){
-		console.log("Server is requesting more chunks of file");
+		Debug("Server is requesting more chunks of file");
 		FSIDRedirect(TheFid).SendBuffer();
 	});
 	
@@ -159,7 +173,7 @@
 	
 	function FocusForm(which)
 	{
-	console.log("focus on " + which);
+	Debug("focus on " + which);
 	if(which == "name")
 	{
 		Password.style.opacity = "0";
@@ -203,7 +217,7 @@
 	function DownloadFile(WhichSid)
 	{
 		var newFTD = FilesToDownload[FilesToDownload.length] = new Object();
-		console.log(newFTD);
+		Debug(newFTD);
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
 		newFTD.Fdata = "";
@@ -221,11 +235,11 @@
 
     						if(e.data['status'] == "debug")
     						{
-    						 console.log("File decrypt debug:" + e.data['message']);
+    						 Debug("File decrypt debug:" + e.data['message']);
     						}
     						else if(e.data['status'] == "error")
     						{
-    						console.log("Error on file decryption, here's message: " + e.data['message']);
+    						Debug("Error on file decryption, here's message: " + e.data['message']);
     						}
     						else if(e.data['status'] == "begin")
     						{
@@ -240,7 +254,7 @@
     							}
     							else
     							{
-    							console.log("It's decrypted!!");
+    							Debug("It's decrypted!!");
     							newFTD.blob = new Blob([newFTD.Fdata], {type: newFTD.Filetype});
 								saveAs(newFTD.blob, newFTD.FileName);
     							}
@@ -300,7 +314,7 @@
 		
      					 this.reader.onerror = function(){
      					 	//Display error
-     					 	console.log("There was an error on reading file...");
+     					 	Debug("There was an error on reading file...");
      					 };
      					 
      					 this.UploadBox.TheCancelButton.onclick = function()
@@ -317,7 +331,7 @@
     					 };
     					 
     					 this.reader.onabort = function(e) {
-      					 console.log('File read cancelled');
+      					 Debug('File read cancelled');
       					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
       					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
       					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
@@ -326,14 +340,14 @@
     					 };
     					 
     					 this.AllDone = function() {
-    					 console.log('Deleting File Upload object...');
+    					 Debug('Deleting File Upload object...');
     					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
       					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
       					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
       					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
       					 UploadFilesContainer.removeChild(that.UploadBox);
       					 that = null;
-      					 console.log("File Upload object deleted");
+      					 Debug("File Upload object deleted");
     					 }
     					 
     					 this.reader.onloadstart = function(e) {
@@ -344,7 +358,7 @@
     					 this.SendBuffer = function()
     					 {
     					 	socket.emit("Chunk",{Fid: that.Fid, data: that.EncryptedFile[0]});
-    					 	console.log("Sent a chunk of file to server...");
+    					 	Debug("Sent a chunk of file to server...");
     					 	if(that.EncryptedFile[0] == "")
     					 	{
     					 	that.AllDone();
@@ -360,9 +374,9 @@
      					 // Closure to capture the file information.
       					this.reader.onload = (function(theFile) {
       					that.UploadBox.TheStatus.innerText = "Encrypting...";
-      					console.log("hmm, this might work...")
+      					Debug("hmm, this might work...")
         				return function(e) {
-        				console.log("Well, it should send to server...")
+        				Debug("Well, it should send to server...")
           				//encrypt, then send to server.
           				that.Worker = new Worker('EncryptFile.js');
           				that.Worker.addEventListener('message', function(e) {
@@ -371,21 +385,21 @@
     						if(e.data['status'] == "ok")
     						{
     						that.EncryptedFile = e.data['data'];
-    						console.log(that.EncryptedFile);
+    						Debug(that.EncryptedFile);
     						}
     						else if(e.data['status'] == "debug")
     						{
-    						 console.log("File encrypt debug:" + e.data['message']);
+    						 Debug("File encrypt debug:" + e.data['message']);
     						}
     						else if(e.data['status'] == "error")
     						{
-    						console.log("Error on file encryption, here's message: " + e.data['message']);
+    						Debug("Error on file encryption, here's message: " + e.data['message']);
     						}
     						else if(e.data['status'] == "begin")
     						{
     							that.UploadBox.TheStatus.innerText = "Sending...";
     							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name, TheType: that.File.type});
-    							console.log("It began getting encrypted file from worker and uploading to server process");
+    							Debug("It began getting encrypted file from worker and uploading to server process");
     							that.Worker.postMessage({cmd: "more data"});
     						}
     						else if(e.data['status'] == "CryptChunk")
@@ -395,7 +409,7 @@
     							//that.EncryptedFile += e.data['data'];
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
     							that.EncryptedFile.push(e.data['data']);
-    							console.log("Received Encrypted chunk from worker");
+    							Debug("Received Encrypted chunk from worker");
     							that.Worker.postMessage({cmd: "more data"});
     							}
     							else
@@ -403,7 +417,7 @@
     							//Send one last chunk (empty), so server knows that file is finished transferring...
     							//socket.emit("Chunk",{Fid: that.Fid, data: ""})
     							that.EncryptedFile.push(e.data['data']);
-    							console.log("It's encrypted!!");
+    							Debug("It's encrypted!!");
     							}
     						}
     						else if(e.data['status'] == "more data")
