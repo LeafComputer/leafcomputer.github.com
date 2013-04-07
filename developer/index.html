@@ -10,6 +10,7 @@
 	<script src="sjcl.js"></script>
 	<script src="filedropper.js"></script>
 	<script src="socket.io.js"></script>
+	<script src="FileSaver.min.js"></script>
 	<script>
 	ChatServerAddress = "http://leafdev.hp.af.cm/";
 	ontitle = false;
@@ -206,6 +207,12 @@
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
 		newFTD.Fdata = "";
+		
+		socket.on("FileInfo", function(TheData){
+			newFTD.Filetype = TheData.TheType;
+			newFTD.FileName = TheData.TheName;
+		});
+		
 		newFTD.conclude = function(){
 		
 		var Place = 0;
@@ -234,7 +241,8 @@
     							else
     							{
     							console.log("It's decrypted!!");
-    							console.log("glory: " + newFTD.Fdata);
+    							newFTD.blob = new Blob([newFTD.Fdata], {type: newFTD.Filetype});
+								saveAs(newFTD.blob, newFTD.FileName);
     							}
     						}
     						else if(e.data['status'] == "more data")
@@ -376,7 +384,7 @@
     						else if(e.data['status'] == "begin")
     						{
     							that.UploadBox.TheStatus.innerText = "Sending...";
-    							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name});
+    							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name, TheType: that.File.type});
     							console.log("It began getting encrypted file from worker and uploading to server process");
     							that.Worker.postMessage({cmd: "more data"});
     						}
