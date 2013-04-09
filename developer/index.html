@@ -255,13 +255,14 @@
     							else
     							{
     							Debug("It's decrypted!!");
-    							
+    							newFTD.ui8a = new Uint8Array(newFTD.Fdata.length);
+    							for (i = 0; i < newFTD.ui8a.length; i++) { 
+    							  newFTD.ui8a[i] = newFTD.Fdata.charCodeAt(i);
+    							}
 
-   								newFTD.blob = BinaryToBlob(newFTD.Fdata, newFTD.Filetype);
+   								newFTD.blob = new Blob([newFTD.ui8a], {type: newFTD.Filetype});
 
 								saveAs(newFTD.blob, newFTD.FileName);
-								
-								
     							}
     						}
     						else if(e.data['status'] == "more data")
@@ -497,20 +498,6 @@
 		Connect(Name.value)
     }
 }
-	</script>
-	<script>
-	function BinaryToBlob(binStr, opt_contentType) {
-
-    var ui8a = new Uint8Array(binStr.length);
-    for (var i = 0; i < ui8a.length; ++i) { 
-      ui8a[i] = binStr.charCodeAt(i);
-    }
-
-    var blob = new Blob([ui8a],
-                        opt_contentType ? {type: opt_contentType} : {});
-
-    return blob;
-  	}
 	</script>
 	
 </head>
