@@ -255,8 +255,7 @@
     							else
     							{
     							Debug("It's decrypted!!");
-    							newFTD.blob = new Blob([newFTD.Fdata], {type: newFTD.Filetype});
-								saveAs(newFTD.blob, newFTD.FileName);
+								Debug(newFTD.Fdata);
     							}
     						}
     						else if(e.data['status'] == "more data")
