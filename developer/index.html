@@ -261,8 +261,7 @@
     							  newFTD.ui8a[i] = newFTD.Fdata.charCodeAt(i);
     							}
 
-   								newFTD.blob = new Blob([newFTD.ui8a],
-                        		newFTD.Filetype ? {type: newFTD.Filetype} : {});
+   								newFTD.blob = new Blob([newFTD.ui8a], {type: newFTD.Filetype});
 
 								saveAs(newFTD.blob, newFTD.FileName);
     							}
