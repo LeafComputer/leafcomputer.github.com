@@ -11,6 +11,7 @@
 	<script src="filedropper.js"></script>
 	<script src="socket.io.js"></script>
 	<script src="FileSaver.min.js"></script>
+	<script src="Filer.js"></script>
 	<script>
 	ChatServerAddress = "http://leafdev.hp.af.cm/";
 	ontitle = false;
@@ -257,7 +258,7 @@
     							Debug("It's decrypted!!");
     							
 
-   								newFTD.blob = BinaryToBlob(newFTD.Fdata, newFTD.Filetype);
+   								newFTD.blob = Util.strToBlob(newFTD.Fdata, newFTD.Filetype);
 
 								saveAs(newFTD.blob, newFTD.FileName);
 								
@@ -497,20 +498,6 @@
 		Connect(Name.value)
     }
 }
-	</script>
-	<script>
-	function BinaryToBlob(binStr, opt_contentType) {
-
-    var ui8a = new Uint8Array(binStr.length);
-    for (i = 0; i < ui8a.length; i++) { 
-      ui8a[i] = binStr.charCodeAt(i);
-    }
-
-    var blob = new Blob([ui8a],
-                        opt_contentType ? {type: opt_contentType} : {});
-
-    return blob;
-  	}
 	</script>
 	
 </head>
