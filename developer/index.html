@@ -256,7 +256,7 @@
     							{
     							Debug("It's decrypted!!");
     							newFTD.ui8a = new Uint8Array(newFTD.Fdata.length);
-    							for (i = 0; i < newFTD.ui8a.length; i++) { 
+    							for (var i = 0; i < newFTD.ui8a.length; i++) { 
     							  newFTD.ui8a[i] = newFTD.Fdata.charCodeAt(i);
     							}
 
