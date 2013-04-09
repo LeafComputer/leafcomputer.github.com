@@ -255,7 +255,13 @@
     							else
     							{
     							Debug("It's decrypted!!");
-    							newFTD.blob = new Blob([newFTD.Fdata], {type: newFTD.Filetype});
+    							newFTD.ui8a = new Uint8Array(newFTD.Fdata.length);
+    							for (var i = 0; i < newFTD.ui8a.length; i++) { 
+    							  newFTD.ui8a[i] = newFTD.Fdata.charCodeAt(i);
+    							}
+
+   								newFTD.blob = new Blob([newFTD.ui8a], {type: newFTD.Filetype});
+
 								saveAs(newFTD.blob, newFTD.FileName);
     							}
     						}
