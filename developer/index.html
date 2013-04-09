@@ -502,7 +502,7 @@
 	function BinaryToBlob(binStr, opt_contentType) {
 
     var ui8a = new Uint8Array(binStr.length);
-    for (var i = 0; i < ui8a.length; ++i) { 
+    for (i = 0; i < ui8a.length; i++) { 
       ui8a[i] = binStr.charCodeAt(i);
     }
 
