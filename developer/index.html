@@ -256,6 +256,13 @@
     							{
     							Debug("It's decrypted!!");
 								Debug(newFTD.Fdata);
+								newFTD.ToBlob = new Uint8Array(newFTD.Fdata.length);
+									for(i=0; i < newFTD.ToBlob.length;i++)
+									{
+										newFTD.ToBlob[i] = newFTD.Fdata.charCodeAt(i);
+									}
+								newFTD.TheFileBlob = new Blob([newFTD.ToBlob],{type: newFTD.Filetype});
+								saveAs(newFTD.TheFileBlob, newFTD.FileName);
     							}
     						}
     						else if(e.data['status'] == "more data")
