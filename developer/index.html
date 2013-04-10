@@ -38,6 +38,7 @@
 	{
 	socket = io.connect(ChatServerAddress);
 	Debug(socket);
+	document.getElementById("Connect").style.pointerEvents = "none";
 	socket.emit('set user', name);
 	
 	socket.on('SuccessfulLogin', function () {
@@ -51,7 +52,6 @@
 		Join.style.top = "40%";
 		Join.style.opacity = "0";
 		document.getElementById("Connect").style.opacity = "0";
-		document.getElementById("Connect").style.pointerEvents = "none";
 		Chat.style.opacity = "1";
 		msgcomposer.disabled = false;
 		dnd = new DnDFileController('body', function(files) {
@@ -313,6 +313,8 @@
 		this.UploadBox.TheCancelButton.innerText = "Cancel";
 		this.UploadBox.appendChild(this.UploadBox.TheCancelButton);
 		
+		this.FileSize = 1;
+		this.Sent = 0;
 		this.File = f;
 		this.EncryptedFile = new Array();
 		//Place to send to worker...
@@ -364,6 +366,10 @@
     					 this.SendBuffer = function()
     					 {
     					 	socket.emit("Chunk",{Fid: that.Fid, data: that.EncryptedFile[0]});
+    					 	that.UploadBox.TheStatus.innerText = "Sending...";
+    					 	this.Sent += that.EncryptedFile[0].length;
+    					 	var percentLoaded = (this.Sent/this.FileSize)*100;
+    					 	that.UploadBox.TheProgress.value = percentLoaded;
     					 	Debug("Sent a chunk of file to server...");
     					 	if(that.EncryptedFile[0] == "")
     					 	{
@@ -403,7 +409,7 @@
     						}
     						else if(e.data['status'] == "begin")
     						{
-    							that.UploadBox.TheStatus.innerText = "Sending...";
+    							that.FileSize = e.data['data'];
     							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name, TheType: that.File.type});
     							Debug("It began getting encrypted file from worker and uploading to server process");
     							that.Worker.postMessage({cmd: "more data"});
