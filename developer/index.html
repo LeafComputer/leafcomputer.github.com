@@ -220,7 +220,7 @@
 		Debug(newFTD);
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
-		newFTD.Fdata = "";
+		newFTD.Fdata = new Array();
 		
 		socket.on("FileInfo", function(TheData){
 			newFTD.Filetype = TheData.TheType;
@@ -247,21 +247,17 @@
     						}
     						else if(e.data['status'] == "CryptChunk")
     						{
-    							if(e.data['data'] != "")
+    							if(e.data['data'].length != 0)
     							{
-    							newFTD.Fdata += e.data['data'];
+    							newFTD.Fdata = newFTD.Fdata.concat(e.data['data']);
     							newFTD.Worker.postMessage({cmd: "more data"});
     							}
     							else
     							{
     							Debug("It's decrypted!!");
 								Debug(newFTD.Fdata);
-								newFTD.ToBlob = new Uint8Array(newFTD.Fdata.length);
-									for(i=0; i < newFTD.ToBlob.length;i++)
-									{
-										newFTD.ToBlob[i] = newFTD.Fdata.charCodeAt(i);
-									}
-								newFTD.TheFileBlob = new Blob([newFTD.ToBlob],{type: newFTD.Filetype});
+								
+								newFTD.TheFileBlob = new Blob([newFTD.Fdata],{type: newFTD.Filetype});
 								saveAs(newFTD.TheFileBlob, newFTD.FileName);
     							}
     						}

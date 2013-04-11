@@ -6,6 +6,7 @@ importScripts('sjcl.js');
 password = "";
 inputFile = "";
 outputFile = "";
+middleFile = "";
 Place = 0;
 toEncrypt = undefined;
 
@@ -68,7 +69,14 @@ function MakeLog(e) {
 
 function SendChunk()
 {
+if((typeof stringValue) == "string")
+{
 postMessage({'status': 'CryptChunk', 'data':outputFile.substring(Place*100000,(Place+1)*100000)});
+}
+else
+{
+postMessage({'status': 'CryptChunk', 'data':outputFile.slice(Place*100000,(Place+1)*100000)});
+}
 Place++;
 }
 
@@ -88,8 +96,15 @@ function EncryptTheFile() {
 function DecryptTheFile() {
     try {
         MakeLog("starting to decrypt file...");
-        outputFile = sjcl.decrypt(password, inputFile);
+        middleFile = sjcl.decrypt(password, inputFile);
         MakeLog("decryption done!!");
+        MakeLog("Enconding...");
+        outputFile = new Uint8Array(middleFile.length);
+									for(i=0; i < outputFile.length;i++)
+									{
+										outputFile[i] = middleFile.charCodeAt(i);
+									}
+		MakeLog("Encoded");
     	postMessage({'status': 'begin', 'data':outputFile.length});
     	MakeLog("File sent from worker to main script");
     } catch(err) {
