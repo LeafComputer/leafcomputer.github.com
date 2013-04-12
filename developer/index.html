@@ -253,7 +253,7 @@
     							for(i=0;i<e.data['data'].length;i++)
     							{
     							Debug("The Place:" + (e.data['place']+i));
-    							Debug("The DATA:"(e.data['data'])[i]);
+    							Debug("The DATA: " + (e.data['data'])[i]);
     							newFTD.Fdata[e.data['place']+i] = (e.data['data'])[i];
     							}
     							newFTD.Worker.postMessage({cmd: "more data"});
