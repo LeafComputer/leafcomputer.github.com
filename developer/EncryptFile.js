@@ -69,7 +69,7 @@ function MakeLog(e) {
 
 function SendChunk()
 {
-if((typeof stringValue) == "string")
+if((typeof outputFile) == "string")
 {
 postMessage({'status': 'CryptChunk', 'data':outputFile.substring(Place*100000,(Place+1)*100000)});
 }
