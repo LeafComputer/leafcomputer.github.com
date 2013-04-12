@@ -243,6 +243,7 @@
     						}
     						else if(e.data['status'] == "begin")
     						{
+    							newFTD.Fdata = new Uint8Array(e.data['size']);
     							newFTD.Worker.postMessage({cmd: "more data"});
     						}
     						else if(e.data['status'] == "CryptChunk")

@@ -106,7 +106,7 @@ function DecryptTheFile() {
 										outputFile[i] = middleFile.charCodeAt(i);
 									}
 		MakeLog("Encoded");
-    	postMessage({'status': 'begin', 'data':outputFile.length});
+    	postMessage({'status': 'begin', 'data':outputFile.length,'size':outputFile.length});
     	MakeLog("File sent from worker to main script");
     } catch(err) {
         Err("Error on decryption: " + err.toString());
