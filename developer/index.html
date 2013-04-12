@@ -271,7 +271,7 @@
     							Place++;
     						}
 						}, false);
-						newFTD.Worker.postMessage({password: Password.value, cmd: "decrypt"});
+						newFTD.Worker.postMessage({password: Password.value, cmd: "decrypt", type: newFTD.Filetype, name: newFTD.FileName});
 						
 						
 		}
