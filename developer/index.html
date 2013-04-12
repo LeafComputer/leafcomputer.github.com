@@ -252,7 +252,7 @@
     							{
     							for(i=0;i<e.data['data'].length;i++)
     							{
-    							newFTD.Fdata[e.data['Place']+i] = (e.data['data'])[i];
+    							newFTD.Fdata[(e.data['Place']*100000)+i] = (e.data['data'])[i];
     							}
     							newFTD.Worker.postMessage({cmd: "more data"});
     							}
