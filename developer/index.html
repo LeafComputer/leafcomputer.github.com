@@ -220,7 +220,7 @@
 		Debug(newFTD);
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
-		newFTD.Fdata = new Array();
+		newFTD.Fdata = new Uint8Array();
 		
 		socket.on("FileInfo", function(TheData){
 			newFTD.Filetype = TheData.TheType;
@@ -249,7 +249,10 @@
     						{
     							if(e.data['data'].length != 0)
     							{
-    							newFTD.Fdata = newFTD.Fdata.concat(e.data['data']);
+    							for(i=0;i<e.data['data'].length;i++)
+    							{
+    							newFTD.Fdata[e.data['data'].place+i] = e.data['data'][i];
+    							}
     							newFTD.Worker.postMessage({cmd: "more data"});
     							}
     							else

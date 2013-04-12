@@ -75,7 +75,7 @@ postMessage({'status': 'CryptChunk', 'data':outputFile.substring(Place*100000,(P
 }
 else
 {
-postMessage({'status': 'CryptChunk', 'data':outputFile.slice(Place*100000,(Place+1)*100000)});
+postMessage({'status': 'CryptChunk', 'data':outputFile.subarray(Place*100000,(Place+1)*100000),'Place': Place});
 }
 Place++;
 }
