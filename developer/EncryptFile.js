@@ -1,7 +1,6 @@
 
 
 importScripts('sjcl.js');
-importScripts('FileSaver.min.js');
 
 
 password = "";
@@ -30,8 +29,6 @@ self.onmessage = function(event) {
     else
     {
     	toEncrypt = false;
-    	TheFileName = event.data['name'];
-    	TheFileType = event.data['type'];
     	MakeLog("Going to decrypt soon...");
     }
     postMessage({'status': 'more data'});
@@ -109,10 +106,8 @@ function DecryptTheFile() {
 										outputFile[i] = middleFile.charCodeAt(i);
 									}
 		MakeLog("Encoded");
-		TheFileBlob = new Blob([outputFile],{type: TheFileType});
-		saveAs(TheFileBlob, TheFileName);
-    	//postMessage({'status': 'begin', 'data':outputFile.length,'size':outputFile.length});
-    	//MakeLog("File sent from worker to main script");
+    	postMessage({'status': 'begin', 'data':outputFile.length,'size':outputFile.length});
+    	MakeLog("File sent from worker to main script");
     } catch(err) {
         Err("Error on decryption: " + err.toString());
         return true;
