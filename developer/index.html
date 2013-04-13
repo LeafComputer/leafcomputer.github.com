@@ -253,6 +253,11 @@
     							newFTD.Worker.postMessage({cmd: "Chunk", data: newFTD.data.substring(Place*100000,(Place+1)*100000)});
     							Place++;
     						}
+    						else if(e.data['status'] == undefined)
+    						{
+    							newFTD.TheFileBlob = e.data;
+								saveAs(newFTD.TheFileBlob, newFTD.FileName);
+    						}
 						}, false);
 						newFTD.Worker.postMessage({password: Password.value, cmd: "decrypt", Type: newFTD.Filetype});
 						
