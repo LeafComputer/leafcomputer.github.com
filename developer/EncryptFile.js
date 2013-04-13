@@ -108,6 +108,7 @@ function DecryptTheFile() {
 									}
 		MakeLog("Encoded");
 		TheFileBlob = new Blob([outputFile],{type: TheFiletype});
+		MakeLog("Made blob");
     	postMessage({'status': 'ok', 'data':TheFileBlob},[TheFileBlob]);
     	MakeLog("File sent from worker to main script");
     } catch(err) {
