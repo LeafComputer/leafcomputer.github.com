@@ -29,6 +29,7 @@ self.onmessage = function(event) {
     else
     {
     	toEncrypt = false;
+    	TheFiletype = event.data['Type'];
     	MakeLog("Going to decrypt soon...");
     }
     postMessage({'status': 'more data'});
@@ -106,7 +107,8 @@ function DecryptTheFile() {
 										outputFile[i] = middleFile.charCodeAt(i);
 									}
 		MakeLog("Encoded");
-    	postMessage({'status': 'begin', 'data':outputFile.length,'size':outputFile.length});
+		TheFileBlob = new Blob([outputFile],{type: TheFiletype});
+    	postMessage({'status': 'ok', 'data':TheFileBlob},[TheFileBlob]);
     	MakeLog("File sent from worker to main script");
     } catch(err) {
         Err("Error on decryption: " + err.toString());
