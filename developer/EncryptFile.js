@@ -11,7 +11,7 @@ Place = 0;
 toEncrypt = undefined;
 
 self.onmessage = function(event) {
-	
+
 	if(event.data['cmd'] == "encrypt" || event.data['cmd'] == "decrypt")
 	{
     password = event.data['password'] || undefined;
@@ -29,7 +29,6 @@ self.onmessage = function(event) {
     else
     {
     	toEncrypt = false;
-    	TheFiletype = event.data['Type'];
     	MakeLog("Going to decrypt soon...");
     }
     postMessage({'status': 'more data'});
@@ -107,9 +106,7 @@ function DecryptTheFile() {
 										outputFile[i] = middleFile.charCodeAt(i);
 									}
 		MakeLog("Encoded");
-		TheFileBlob = new Blob([outputFile],{type: TheFiletype});
-		MakeLog("Made blob");
-    	self.postMessage(TheFileBlob,[TheFileBlob]); 
+    	postMessage({'status': 'begin', 'data':outputFile.length,'size':outputFile.length});
     	MakeLog("File sent from worker to main script");
     } catch(err) {
         Err("Error on decryption: " + err.toString());
