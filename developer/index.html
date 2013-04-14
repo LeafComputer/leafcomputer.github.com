@@ -224,7 +224,10 @@
 		newFTD.FileSize = 1;
 		newFTD.TheFileBlob = new Blob();
 		newFTD.msg = TheMsg;
-		newFTD.msg.outerHTML = "Downloading...";
+		newFTD.onclick = function(event){
+		event.preventDefault();
+		};
+		newFTD.msg.innerHTML = "Downloading...";
 
 		socket.on("FileInfo", function(TheData){
 			newFTD.Filetype = TheData.TheType;
@@ -234,13 +237,13 @@
 		
 		newFTD.ChangeStatus = function(NewStat)
 		{
-			newFTD.msg.outerHTML = NewStat;
+			newFTD.msg.innerHTML = NewStat;
 		}
 
 		newFTD.conclude = function(){
 
 		var Place = 0;
-		newFTD.msg.outerHTML = "Decrypting...";
+		newFTD.ChangeStatus("Decrypting...");
 		newFTD.Worker = new Worker('EncryptFile.js');
           				newFTD.Worker.addEventListener('message', function(e) {
 
@@ -251,13 +254,13 @@
     						else if(e.data['status'] == "error")
     						{
     						Debug("Error on file decryption, here's message: " + e.data['message']);
-    						newFTD.msg.outerHTML = "Error on file decryption... Most likely you are using a wrong password";
+    						newFTD.ChangeStatus("Error on file decryption... Most likely you are using a wrong password");
     						}
     						else if(e.data['status'] == "begin")
     						{
     							newFTD.Fdata = new Uint8Array(e.data['size']);
     							newFTD.Worker.postMessage({cmd: "more data"});
-    							newFTD.msg.outerHTML = "Decrypted! preparing file...";
+    							newFTD.ChangeStatus("Decrypted! preparing file...");
     						}
     						else if(e.data['status'] == "CryptChunk")
     						{
@@ -269,10 +272,10 @@
     							else
     							{
     							Debug("It's decrypted!!");
-    							newFTD.msg.outerHTML = "Saving to computer...";
+    							newFTD.ChangeStatus("Saving to computer...");
 
 								saveAs(newFTD.TheFileBlob, newFTD.FileName);
-								newFTD.msg.outerHTML = "The File '" + newFTD.FileName + "' successfully saved on your computer (I guess it's on Downloads folder)!!!";
+								newFTD.ChangeStatus( "The File '" + newFTD.FileName + "' successfully saved on your computer (I guess it's on Downloads folder)!!!");
     							}
     						}
     						else if(e.data['status'] == "more data")
