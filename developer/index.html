@@ -267,7 +267,7 @@
     							if(e.data['data'].length != 0)
     							{
     							newFTD.TheFileBlob = new Blob([newFTD.TheFileBlob, e.data['data']],{type: newFTD.Filetype});
-    							setTimeout(function(){newFTD.Worker.postMessage({cmd: "more data"});}, 20);
+    							setTimeout(function(){newFTD.Worker.postMessage({cmd: "more data"});}, 100);
     							}
     							else
     							{
