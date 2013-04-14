@@ -121,6 +121,7 @@
 		if(TheData.data != "")
 		{
 			FSIDRedirect(TheData.Fid).data += TheData.data;
+			FSIDRedirect(TheData.Fid).msg.outerHTML = "Downloading... (" + Math.round((FSIDRedirect(TheData.Fid).data.length/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)";
 			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.Downloaded})
 		}
 		else
@@ -220,16 +221,21 @@
 		Debug(newFTD);
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
+		newFTD.FileSize = 1;
 		newFTD.TheFileBlob = new Blob();
+		newFTD.msg = this;
+		newFTD.msg.outerHTML = "Downloading...";
 
 		socket.on("FileInfo", function(TheData){
 			newFTD.Filetype = TheData.TheType;
 			newFTD.FileName = TheData.TheName;
+			newFTD.FileSize = TheData.TheSize;
 		});
 
 		newFTD.conclude = function(){
 
 		var Place = 0;
+		newFTD.msg.outerHTML = "Decrypting...";
 		newFTD.Worker = new Worker('EncryptFile.js');
           				newFTD.Worker.addEventListener('message', function(e) {
 
@@ -240,11 +246,13 @@
     						else if(e.data['status'] == "error")
     						{
     						Debug("Error on file decryption, here's message: " + e.data['message']);
+    						newFTD.msg.outerHTML = "Error on file decryption... Most likely you are using a wrong password";
     						}
     						else if(e.data['status'] == "begin")
     						{
     							newFTD.Fdata = new Uint8Array(e.data['size']);
     							newFTD.Worker.postMessage({cmd: "more data"});
+    							newFTD.msg.outerHTML = "Decrypted! preparing file...";
     						}
     						else if(e.data['status'] == "CryptChunk")
     						{
@@ -256,8 +264,10 @@
     							else
     							{
     							Debug("It's decrypted!!");
+    							newFTD.msg.outerHTML = "Saving to computer...";
 
 								saveAs(newFTD.TheFileBlob, newFTD.FileName);
+								newFTD.msg.outerHTML = "The File '" + newFTD.FileName + "' successfully saved on your computer (I guess it's on Downloads folder)!!!";
     							}
     						}
     						else if(e.data['status'] == "more data")
