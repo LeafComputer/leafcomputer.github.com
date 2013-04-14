@@ -220,7 +220,7 @@
 		Debug(newFTD);
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
 		newFTD.data = "";
-		newFTD.Fdata = new Uint8Array();
+		newFTD.TheFileBlob = new Blob();
 
 		socket.on("FileInfo", function(TheData){
 			newFTD.Filetype = TheData.TheType;
@@ -250,18 +250,13 @@
     						{
     							if(e.data['data'].length != 0)
     							{
-    							for(i=0;i<e.data['data'].length;i++)
-    							{
-    							newFTD.Fdata[(e.data['Place']*100000)+i] = (e.data['data'])[i];
-    							}
+    							newFTD.TheFileBlob = new Blob([newFTD.TheFileBlob, e.data['data']],{type: newFTD.Filetype});
     							newFTD.Worker.postMessage({cmd: "more data"});
     							}
     							else
     							{
     							Debug("It's decrypted!!");
-								Debug(newFTD.Fdata);
 
-								newFTD.TheFileBlob = new Blob([newFTD.Fdata],{type: newFTD.Filetype});
 								saveAs(newFTD.TheFileBlob, newFTD.FileName);
     							}
     						}
