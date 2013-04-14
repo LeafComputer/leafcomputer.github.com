@@ -232,7 +232,7 @@
 			newFTD.FileSize = TheData.TheSize;
 		});
 		
-		newFTD.ChangeStatus(NewStat)
+		newFTD.ChangeStatus = function(NewStat)
 		{
 			newFTD.msg.outerHTML = NewStat;
 		}
