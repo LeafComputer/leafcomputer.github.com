@@ -224,7 +224,7 @@
 		newFTD.FileSize = 1;
 		newFTD.TheFileBlob = new Blob();
 		newFTD.msg = TheMsg;
-		newFTD.onclick = function(event){
+		newFTD.msg.onclick = function(event){
 		event.preventDefault();
 		};
 		newFTD.msg.innerHTML = "Downloading...";
