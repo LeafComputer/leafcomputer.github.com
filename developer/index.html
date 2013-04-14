@@ -435,7 +435,7 @@
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
     							that.EncryptedFile.push(e.data['data']);
     							Debug("Received Encrypted chunk from worker");
-    							that.Worker.postMessage({cmd: "more data"});
+    							setTimeout(function(){that.Worker.postMessage({cmd: "more data"});}, 100);
     							}
     							else
     							{
