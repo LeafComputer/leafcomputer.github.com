@@ -121,7 +121,7 @@
 		if(TheData.data != "")
 		{
 			FSIDRedirect(TheData.Fid).data += TheData.data;
-			FSIDRedirect(TheData.Fid).msg.outerHTML = "Downloading... (" + Math.round((FSIDRedirect(TheData.Fid).data.length/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)";
+			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((FSIDRedirect(TheData.Fid).data.length/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
 			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.Downloaded})
 		}
 		else
@@ -231,6 +231,11 @@
 			newFTD.FileName = TheData.TheName;
 			newFTD.FileSize = TheData.TheSize;
 		});
+		
+		newFTD.ChangeStatus(NewStat)
+		{
+			newFTD.msg.outerHTML = NewStat;
+		}
 
 		newFTD.conclude = function(){
 
