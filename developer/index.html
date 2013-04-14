@@ -447,8 +447,7 @@
     						}
     						else if(e.data['status'] == "more data")
     						{
-    							setTimeout(function(){that.Worker.postMessage({cmd: "Chunk", data: that.reader.result.substring(Place*100000,(Place+1)*100000)});}, 100);
-    							Place++;
+    							setTimeout(function(){that.Worker.postMessage({cmd: "Chunk", data: that.reader.result.substring(Place*100000,(Place+1)*100000)});Place++;}, 100);
     						}
 						}, false);
 						that.Worker.postMessage({password: Password.value, cmd: "encrypt"});
