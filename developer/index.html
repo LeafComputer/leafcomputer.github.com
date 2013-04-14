@@ -398,10 +398,10 @@
 
      					 // Closure to capture the file information.
       					this.reader.onload = (function(theFile) {
-      					that.UploadBox.TheStatus.innerText = "Encrypting...";
       					Debug("hmm, this might work...")
         				return function(e) {
         				Debug("Well, it should send to server...")
+        				that.UploadBox.TheStatus.innerText = "Encrypting...";
           				//encrypt, then send to server.
           				that.Worker = new Worker('EncryptFile.js');
           				that.Worker.addEventListener('message', function(e) {
