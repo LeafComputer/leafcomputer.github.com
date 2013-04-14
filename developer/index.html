@@ -215,7 +215,7 @@
 	}
 	}
 
-	function DownloadFile(WhichSid)
+	function DownloadFile(WhichSid,TheMsg)
 	{
 		var newFTD = FilesToDownload[FilesToDownload.length] = new Object();
 		Debug(newFTD);
@@ -223,7 +223,7 @@
 		newFTD.data = "";
 		newFTD.FileSize = 1;
 		newFTD.TheFileBlob = new Blob();
-		newFTD.msg = this;
+		newFTD.msg = TheMsg;
 		newFTD.msg.outerHTML = "Downloading...";
 
 		socket.on("FileInfo", function(TheData){
