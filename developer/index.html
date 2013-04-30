@@ -436,20 +436,20 @@
 	function FileBox()
 	{
 		this.TheBox = document.createElement("div");
-		this.className = "UploadFile";
+		this.TheBox.className = "UploadFile";
 		UploadFilesContainer.appendChild(this.TheBox);
 		this.TheTitle = document.createElement("div");
-		this.appendChild(this.TheTitle);
+		this.TheBox.appendChild(this.TheTitle);
 		this.TheStatus = document.createElement("div");
-		this.appendChild(this.TheStatus);
+		this.TheBox.appendChild(this.TheStatus);
 		this.TheProgress = document.createElement("progress");
 		this.TheProgress.max = "100";
 		this.TheProgress.value = "0";
-		this.appendChild(this.TheProgress);
+		this.TheBox.appendChild(this.TheProgress);
 		this.TheCancelButton = document.createElement("button");
 		this.TheCancelButton.className = "FileUploadBtn";
 		this.TheCancelButton.innerText = "Cancel";
-		this.appendChild(this.TheCancelButton);
+		this.TheBox.appendChild(this.TheCancelButton);
 	}
 
 	function ShowElement(which)
