@@ -136,7 +136,7 @@
 	});
 
 		socket.on("more data", function(TheFid){
-		Debug("Server is requesting more chunks of file");
+		Debug("Server is requesting more chunks of file at Fid " + TheFid);
 		FSIDRedirect(TheFid).SendBuffer();
 	});
 
