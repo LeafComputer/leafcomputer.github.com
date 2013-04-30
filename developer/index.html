@@ -345,7 +345,7 @@
       					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
       					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
       					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
-      					 UploadFilesContainer.removeChild(that.UploadBox);
+      					 UploadFilesContainer.removeChild(that.UploadBox.TheBox);
     					 };
     					 
     					 this.AllDone = function() {
@@ -354,7 +354,7 @@
       					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
       					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
       					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
-      					 UploadFilesContainer.removeChild(that.UploadBox);
+      					 UploadFilesContainer.removeChild(that.UploadBox.TheBox);
       					 that = null;
       					 Debug("File Upload object deleted");
     					 }
@@ -435,9 +435,9 @@
 
 	function FileBox()
 	{
-		this = document.createElement("div");
+		this.TheBox = document.createElement("div");
 		this.className = "UploadFile";
-		UploadFilesContainer.appendChild(this);
+		UploadFilesContainer.appendChild(this.TheBox);
 		this.TheTitle = document.createElement("div");
 		this.appendChild(this.TheTitle);
 		this.TheStatus = document.createElement("div");
