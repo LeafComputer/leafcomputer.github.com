@@ -419,7 +419,7 @@
     							//Send one last chunk (empty), so server knows that file is finished transferring...
     							//socket.emit("Chunk",{Fid: that.Fid, data: ""})
     							that.EncryptedFile.push(e.data['data']);
-    							socket.emit("NewFile",{Fid: that.Fid, TheTitle:that.File.name, TheType:that.File.type});
+    							socket.emit("NewFile",{TheID: that.Fid, TheTitle:that.File.name, TheType:that.File.type});
     							Debug("It's encrypted!!");
     							} 
     						} 
