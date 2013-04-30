@@ -403,7 +403,7 @@
           				//encrypt, then send to server.
           				that.Worker = new Worker('EncryptFile.js');
           				that.Worker.addEventListener('message', function(e) {
-    						else if(e.data['status'] == "CryptChunk")
+    						if(e.data['status'] == "CryptChunk")
     						{
     							if(e.data['data'] != "")
     							{
