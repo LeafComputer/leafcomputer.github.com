@@ -120,7 +120,11 @@
 		Debug(TheData);
 		if(TheData.data != "")
 		{
-			FSIDRedirect(TheData.Fid).data += TheData.data;
+			FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] += TheData.data;
+					if(SearchString("}",TheData.data))
+					{
+						FSIDRedirect(TheData.Fid).writeshift++;
+					}
 			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((FSIDRedirect(TheData.Fid).data.length/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
 			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.Downloaded})
 		}
@@ -217,35 +221,42 @@
 
 	function DownloadFile(WhichSid,TheMsg)
 	{
-		var newFTD = FilesToDownload[FilesToDownload.length] = new Object();
-		Debug(newFTD);
-		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(newFTD),downloaded:0});
-		newFTD.data = "";
-		newFTD.FileSize = 1;
-		newFTD.TheFileBlob = new Blob();
-		newFTD.msg = TheMsg;
-		newFTD.msg.onclick = function(event){
+		FilesToDownload.push(new FileToDownload(TheMsg));
+		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0});
+
+
+	}
+	
+	function FileToDownload(TheMsg)
+	{
+	var that = this;
+			that.data = new Array();
+		that.FileSize = 1;
+		that.writeshift = 0;
+		that.TheFileBlob = new Blob();
+		that.msg = TheMsg;
+		that.msg.onclick = function(event){
 		event.preventDefault();
 		};
-		newFTD.msg.innerHTML = "Downloading...";
+		that.msg.innerHTML = "Downloading...";
 
 		socket.on("FileInfo", function(TheData){
-			newFTD.Filetype = TheData.TheType;
-			newFTD.FileName = TheData.TheName;
-			newFTD.FileSize = TheData.TheSize;
+			that.Filetype = TheData.TheType;
+			that.FileName = TheData.TheName;
+			that.FileSize = TheData.TheSize;
 		});
 		
-		newFTD.ChangeStatus = function(NewStat)
+		that.ChangeStatus = function(NewStat)
 		{
-			newFTD.msg.innerHTML = NewStat;
+			that.msg.innerHTML = NewStat;
 		}
 
-		newFTD.conclude = function(){
+		that.conclude = function(){
 
 		var Place = 0;
-		newFTD.ChangeStatus("Decrypting...");
-		newFTD.Worker = new Worker('EncryptFile.js');
-          				newFTD.Worker.addEventListener('message', function(e) {
+		that.ChangeStatus("Decrypting...");
+		that.Worker = new Worker('EncryptFile.js');
+          				that.Worker.addEventListener('message', function(e) {
 
     						if(e.data['status'] == "debug")
     						{
@@ -254,41 +265,31 @@
     						else if(e.data['status'] == "error")
     						{
     						Debug("Error on file decryption, here's message: " + e.data['message']);
-    						newFTD.ChangeStatus("Error on file decryption... Most likely you are using a wrong password");
+    						that.ChangeStatus("Error on file decryption... Most likely you are using a wrong password");
     						}
-    						else if(e.data['status'] == "begin")
+    						else if(e.data['status'] == "Chunk")
     						{
-    							newFTD.Fdata = new Uint8Array(e.data['size']);
-    							newFTD.Worker.postMessage({cmd: "more data"});
-    							newFTD.ChangeStatus("Decrypted! preparing file...");
-    						}
-    						else if(e.data['status'] == "CryptChunk")
-    						{
+    							//Pin point
     							if(e.data['data'].length != 0)
     							{
-    							newFTD.TheFileBlob = new Blob([newFTD.TheFileBlob, e.data['data']],{type: newFTD.Filetype});
-    							setTimeout(function(){newFTD.Worker.postMessage({cmd: "more data"});}, 100);
+    							that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
+    							that.data.splice(0,1);
+    							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });}, 100);
     							}
     							else
     							{
     							Debug("It's decrypted!!");
-    							newFTD.ChangeStatus("Saving to computer...");
+    							that.ChangeStatus("Saving to computer...");
 
-								saveAs(newFTD.TheFileBlob, newFTD.FileName);
-								newFTD.ChangeStatus( "The File '" + newFTD.FileName + "' successfully saved on your computer (I guess it's on Downloads folder)!!!");
+								saveAs(that.TheFileBlob, that.FileName);
+								that.ChangeStatus( "The File '" + that.FileName + "' successfully saved on your computer (I guess it's on Downloads folder)!!!");
     							}
     						}
-    						else if(e.data['status'] == "more data")
-    						{
-    							newFTD.Worker.postMessage({cmd: "Chunk", data: newFTD.data.substring(Place*100000,(Place+1)*100000)});
-    							Place++;
-    						}
 						}, false);
-						newFTD.Worker.postMessage({password: Password.value, cmd: "decrypt"});
+						that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });
 
 
 		}
-
 	}
 
 	function FSIDRedirect(whichFSID)
@@ -310,21 +311,7 @@
 		this.reader = new FileReader();
 
 		//Set the HTML tags
-		this.UploadBox = document.createElement("div");
-		this.UploadBox.className = "UploadFile";
-		UploadFilesContainer.appendChild(this.UploadBox);
-		this.UploadBox.TheTitle = document.createElement("div");
-		this.UploadBox.appendChild(this.UploadBox.TheTitle);
-		this.UploadBox.TheStatus = document.createElement("div");
-		this.UploadBox.appendChild(this.UploadBox.TheStatus);
-		this.UploadBox.TheProgress = document.createElement("progress");
-		this.UploadBox.TheProgress.max = "100";
-		this.UploadBox.TheProgress.value = "0";
-		this.UploadBox.appendChild(this.UploadBox.TheProgress);
-		this.UploadBox.TheCancelButton = document.createElement("button");
-		this.UploadBox.TheCancelButton.className = "FileUploadBtn";
-		this.UploadBox.TheCancelButton.innerText = "Cancel";
-		this.UploadBox.appendChild(this.UploadBox.TheCancelButton);
+		this.UploadBox = new FileBox();
 
 		this.FileSize = 1;
 		this.Sent = 0;
@@ -332,6 +319,7 @@
 		this.EncryptedFile = new Array();
 		//Place to send to worker...
 		var Place = 0;
+		var SendPlace = 0;
 
      					 this.reader.onerror = function(){
      					 	//Display error
@@ -378,20 +366,30 @@
     					 
     					 this.SendBuffer = function()
     					 {
-    					 	socket.emit("Chunk",{Fid: that.Fid, data: that.EncryptedFile[0]});
+    						var tosendnow = that.EncryptedFile[0].substring(SendPlace*100000,(SendPlace+1)*100000);
+    						SendPlace++;
+    						if(tosendnow == "")
+    						{
+    							if(that.EncryptedFile[0] == "")
+    					 		{
+    					 			that.AllDone();
+    					 		}
+    					 		else
+    					 		{
+    					 			that.EncryptedFile.splice(0,1);
+    					 			SendPlace = 0;
+    					 			that.SendBuffer();
+    					 			return;
+    					 		}
+    						}
+    					 	socket.emit("Chunk",{Fid: that.Fid, data: tosendnow});
+    					 	
     					 	that.UploadBox.TheStatus.innerText = "Sending...";
     					 	this.Sent += that.EncryptedFile[0].length;
     					 	var percentLoaded = (this.Sent/this.FileSize)*100;
     					 	that.UploadBox.TheProgress.value = percentLoaded;
     					 	Debug("Sent a chunk of file to server...");
-    					 	if(that.EncryptedFile[0] == "")
-    					 	{
-    					 	that.AllDone();
-    					 	}
-    					 	else
-    					 	{
-    					 	that.EncryptedFile.splice(0,1);
-    					 	}
+    					 	
     					 }
     					 
     					 
@@ -405,28 +403,6 @@
           				//encrypt, then send to server.
           				that.Worker = new Worker('EncryptFile.js');
           				that.Worker.addEventListener('message', function(e) {
-    						//send e to server
-    						//socket.emit
-    						if(e.data['status'] == "ok")
-    						{
-    						that.EncryptedFile = e.data['data'];
-    						Debug(that.EncryptedFile);
-    						}
-    						else if(e.data['status'] == "debug")
-    						{
-    						 Debug("File encrypt debug:" + e.data['message']);
-    						}
-    						else if(e.data['status'] == "error")
-    						{
-    						Debug("Error on file encryption, here's message: " + e.data['message']);
-    						}
-    						else if(e.data['status'] == "begin")
-    						{
-    							that.FileSize = e.data['data'];
-    							socket.emit('NewFile', {TheID: that.Fid, TheTitle: that.File.name, TheType: that.File.type});
-    							Debug("It began getting encrypted file from worker and uploading to server process");
-    							that.Worker.postMessage({cmd: "more data"});
-    						}
     						else if(e.data['status'] == "CryptChunk")
     						{
     							if(e.data['data'] != "")
@@ -435,28 +411,45 @@
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
     							that.EncryptedFile.push(e.data['data']);
     							Debug("Received Encrypted chunk from worker");
-    							setTimeout(function(){that.Worker.postMessage({cmd: "more data"});}, 100);
+    							Place++;
+    							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "encrypt", chunk: that.reader.result.substring(Place*100000,(Place+1)*100000) });}, 100);
     							}
     							else
     							{
     							//Send one last chunk (empty), so server knows that file is finished transferring...
     							//socket.emit("Chunk",{Fid: that.Fid, data: ""})
     							that.EncryptedFile.push(e.data['data']);
+    							socket.emit("NewFile",{Fid: that.Fid, TheTitle:that.File.name, TheType:that.File.type});
     							Debug("It's encrypted!!");
-    							}
-    						}
-    						else if(e.data['status'] == "more data")
-    						{
-    							setTimeout(function(){that.Worker.postMessage({cmd: "Chunk", data: that.reader.result.substring(Place*100000,(Place+1)*100000)});Place++;}, 100);
-    						}
-						}, false);
-						that.Worker.postMessage({password: Password.value, cmd: "encrypt"});
+    							} 
+    						} 
+    						}, false);
+						that.Worker.postMessage({password: Password.value, cmd: "encrypt", chunk: that.reader.result.substring(Place*100000,(Place+1)*100000)});
           				//this.EncryptedFile = sjcl.encrypt(Password.value, e.target.result)
         				};
      				 	})(f);
 
      					 // Read the file as a data URL.
       				this.reader.readAsBinaryString(f);
+	}
+	
+	function FileBox()
+	{
+		this = document.createElement("div");
+		this.className = "UploadFile";
+		UploadFilesContainer.appendChild(this);
+		this.TheTitle = document.createElement("div");
+		this.appendChild(this.TheTitle);
+		this.TheStatus = document.createElement("div");
+		this.appendChild(this.TheStatus);
+		this.TheProgress = document.createElement("progress");
+		this.TheProgress.max = "100";
+		this.TheProgress.value = "0";
+		this.appendChild(this.TheProgress);
+		this.TheCancelButton = document.createElement("button");
+		this.TheCancelButton.className = "FileUploadBtn";
+		this.TheCancelButton.innerText = "Cancel";
+		this.appendChild(this.TheCancelButton);
 	}
 
 	function ShowElement(which)
