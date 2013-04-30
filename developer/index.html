@@ -405,7 +405,7 @@
           				that.Worker.addEventListener('message', function(e) {
     						if(e.data['status'] == "CryptChunk")
     						{
-    							if(e.data['data'] != "")
+    							if(that.reader.result.substring(Place*100000,(Place+1)*100000) != "")
     							{
     							//that.EncryptedFile += e.data['data'];
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
