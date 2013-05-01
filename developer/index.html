@@ -341,19 +341,19 @@
     					 
     					 this.reader.onabort = function(e) {
       					 Debug('File read cancelled');
-      					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
-      					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
-      					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
-      					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheCancelButton);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheProgress);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheStatus);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheTitle);
       					 UploadFilesContainer.removeChild(that.UploadBox.TheBox);
     					 };
     					 
     					 this.AllDone = function() {
     					 Debug('Deleting File Upload object...');
-    					 that.UploadBox.removeChild(that.UploadBox.TheCancelButton);
-      					 that.UploadBox.removeChild(that.UploadBox.TheProgress);
-      					 that.UploadBox.removeChild(that.UploadBox.TheStatus);
-      					 that.UploadBox.removeChild(that.UploadBox.TheTitle);
+    					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheCancelButton);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheProgress);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheStatus);
+      					 that.UploadBox.TheBox.removeChild(that.UploadBox.TheTitle);
       					 UploadFilesContainer.removeChild(that.UploadBox.TheBox);
       					 that = null;
       					 Debug("File Upload object deleted");
@@ -372,7 +372,9 @@
     						{
     							if(that.EncryptedFile[0] == "")
     					 		{
+    					 			socket.emit("Chunk",{Fid: that.Fid, data: tosendnow});
     					 			that.AllDone();
+    					 			return;
     					 		}
     					 		else
     					 		{
