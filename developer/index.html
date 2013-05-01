@@ -221,14 +221,17 @@
 
 	function DownloadFile(WhichSid,TheMsg)
 	{
+		Debug("Started downloading");
 		FilesToDownload.push(new FileToDownload(TheMsg));
+		 Debug("Ok, now is asking the server...");
 		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0});
-
+		 Debug("Ok, now standby");
 
 	}
 
 	function FileToDownload(TheMsg)
 	{
+	 Debug("Creating a download object...");
 	var that = this;
 			that.data = new Array();
 		that.FileSize = 1;
