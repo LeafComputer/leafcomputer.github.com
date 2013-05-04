@@ -120,7 +120,14 @@
 		Debug(TheData);
 		if(TheData.data != "")
 		{
-			FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] += TheData.data;
+			if(FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] != undefined)
+			{
+				FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] += TheData.data;
+			}
+			else
+			{
+				FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] = TheData.data;
+			}
 					if(SearchString("}",TheData.data))
 					{
 						FSIDRedirect(TheData.Fid).writeshift++;
