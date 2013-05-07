@@ -120,6 +120,8 @@
 		Debug(TheData);
 		if(TheData.data != "")
 		{
+			Debug("Download object:");
+			Debug(FSIDRedirect(TheData.Fid));
 			if(FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] != undefined)
 			{
 				FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] += TheData.data;
