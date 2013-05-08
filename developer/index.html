@@ -264,7 +264,7 @@
 		}
 
 		that.conclude = function(){
-
+		Debug("Concluded downloading! The downloaded data is:" +that.data);
 		var Place = 0;
 		that.ChangeStatus("Decrypting...");
 		that.Worker = new Worker('EncryptFile.js');
@@ -281,11 +281,13 @@
     						}
     						else if(e.data['status'] == "Chunk")
     						{
-    							//Pin point
+    							Debug("Got a decrypted chunk");
     							if(e.data['data'].length != 0)
     							{
     							that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
+    							Debug("Written to a blob");
     							that.data.splice(0,1);
+    							Debug("Now, there's only " + that.data.length + " chunks to decrypt.");
     							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });}, 100);
     							}
     							else
