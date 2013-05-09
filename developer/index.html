@@ -437,6 +437,7 @@
     							that.EncryptedFile.push("");
     							socket.emit("NewFile",{TheID: that.Fid, TheTitle:that.File.name, TheType:that.File.type});
     							Debug("It's encrypted!!");
+    							Debug("Here is the encrypted data: " + that.EncryptedFile);
     							} 
     						} 
     						}, false);
