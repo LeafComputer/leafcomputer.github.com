@@ -232,7 +232,7 @@
 		Debug("Started downloading");
 		FilesToDownload.push(new FileToDownload(TheMsg));
 		 Debug("Ok, now is asking the server...");
-		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1])});
+			socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0,stringknife:0,writeshift:0});
 		 Debug("Ok, now standby");
 
 	}
