@@ -132,7 +132,8 @@
 			{
 				FSIDRedirect(TheData.Fid).data[TheData.writeshift] = TheData.data;
 			}
-			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((TheData.downloaded/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
+			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading...");
+			//FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((TheData.downloaded/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
 			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.downloaded,writeshift:TheData.writeshift,stringknife:TheData.stringknife});
 		}
 		else
