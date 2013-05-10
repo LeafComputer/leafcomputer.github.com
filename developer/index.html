@@ -20,6 +20,7 @@
 	nextid = -1;
 	FSIDCallbacks = new Array();
 	DebugMode = false;
+	isConnected = false;
 
 	function Debug(message)
 	{
@@ -42,6 +43,7 @@
 	socket.emit('set user', name);
 
 	socket.on('SuccessfulLogin', function () {
+		isConnected = true;
 	//Load Chat Elements
         Name.style.opacity = "0";
 		Name.style.top = "40%";
@@ -122,20 +124,16 @@
 		{
 			Debug("Download object:");
 			Debug(FSIDRedirect(TheData.Fid).data);
-			if(FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] != undefined)
+			if(FSIDRedirect(TheData.Fid).data[TheData.writeshift] != undefined)
 			{
-				FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] += TheData.data;
+				FSIDRedirect(TheData.Fid).data[TheData.writeshift] += TheData.data;
 			}
 			else
 			{
-				FSIDRedirect(TheData.Fid).data[FSIDRedirect(TheData.Fid).writeshift] = TheData.data;
+				FSIDRedirect(TheData.Fid).data[TheData.writeshift] = TheData.data;
 			}
-					if(SearchString("}",TheData.data))
-					{
-						FSIDRedirect(TheData.Fid).writeshift++;
-					}
-			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((FSIDRedirect(TheData.Fid).data.length/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
-			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.Downloaded})
+			FSIDRedirect(TheData.Fid).ChangeStatus("Downloading... (" + Math.round((TheData.downloaded/FSIDRedirect(TheData.Fid).FileSize)*100) + "%)");
+			socket.emit("more data",{Sid:TheData.Sid,Fid:TheData.Fid,downloaded:TheData.downloaded,writeshift:TheData.writeshift,stringknife:TheData.stringknife});
 		}
 		else
 		{
@@ -233,7 +231,7 @@
 		Debug("Started downloading");
 		FilesToDownload.push(new FileToDownload(TheMsg));
 		 Debug("Ok, now is asking the server...");
-		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0});
+		socket.emit("DownloadFile", {Sid:WhichSid,Fid:NewFSID(FilesToDownload[FilesToDownload.length-1]),downloaded:0,stringknife:0,writeshift:0});
 		 Debug("Ok, now standby");
 
 	}
@@ -244,7 +242,7 @@
 	var that = this;
 			that.data = new Array();
 		that.FileSize = 1;
-		that.writeshift = 0;
+		//that.writeshift = 0;
 		that.TheFileBlob = new Blob();
 		that.msg = TheMsg;
 		that.msg.onclick = function(event){
@@ -542,7 +540,7 @@
 	</script>
 
 </head>
-<body id="TheBody" onload="setTimeout('Load()', 1000)" onmousemove="if(ontitle){LoadNameInput()}" ontouchend="if(ontitle){LoadNameInput()}">
+<body id="TheBody" onunload="if(isConnected){socket.emit('dodisconnect');}" onload="setTimeout('Load()', 1000)" onmousemove="if(ontitle){LoadNameInput()}" ontouchend="if(ontitle){LoadNameInput()}">
 	<div id="Connect">
 		<h1 id="title" onclick="ShowPrevious()" onmouseover="ShowPrevious()">LeafDev</h1>
 		<input onfocus="FocusForm('name')" onblur="FocusForm('password')" id="Name" class="logininput" oninput="if(Name.value != ''){ShowElement('password');}else{ HideElement('password');}" placeholder="Name">
