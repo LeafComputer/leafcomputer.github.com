@@ -300,6 +300,7 @@
     								}
     							Debug("Written to a blob");
     							that.data.splice(0,1);
+    							that.ChangeStatus("Decrypting...(" + ((1/that.data.length)*100) + ")");
     							Debug("Now, there's only " + that.data.length + " chunks to decrypt.");
     							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });}, 100);
     							}
@@ -424,7 +425,7 @@
     					 	socket.emit("Chunk",{Fid: that.Fid, data: tosendnow});
     					 	
     					 	that.UploadBox.TheStatus.innerText = "Sending...";
-    					 	this.Sent += that.EncryptedFile[0].length;
+    					 	this.Sent += tosendnow.length;
     					 	var percentLoaded = (this.Sent/this.FileSize)*100;
     					 	that.UploadBox.TheProgress.value = percentLoaded;
     					 	Debug("Sent a chunk of file to server...");
@@ -446,6 +447,7 @@
     						{
     							if(that.reader.result.substring(Place*100000,(Place+1)*100000) != "")
     							{
+    							that.UploadBox.TheProgress.value = (((Place+1)*100000)/that.reader.result.length)*100;
     							//that.EncryptedFile += e.data['data'];
     							//socket.emit("Chunk",{Fid: that.Fid, data: e.data['data']});
     							that.EncryptedFile.push(e.data['data']);
@@ -460,6 +462,11 @@
     							that.EncryptedFile.push("");
     							socket.emit("NewFile",{TheID: that.Fid, TheTitle:that.File.name, TheType:that.File.type});
     							Debug("It's encrypted!!");
+    							that.FileSize = 0;
+    							for(i=0;i<that.EncryptedFile.length;i++)
+								{
+								that.FileSize += that.EncryptedFile[i].length;
+								}
     							Debug("Here is the encrypted data: " + that.EncryptedFile);
     							} 
     						} 
