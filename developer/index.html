@@ -281,7 +281,7 @@
     						else if(e.data['status'] == "Chunk")
     						{
     							Debug("Got a decrypted chunk");
-    							if(e.data['data'].length != 0)
+    							if(that.data.length > 0)
     							{
     							that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
     							Debug("Written to a blob");
