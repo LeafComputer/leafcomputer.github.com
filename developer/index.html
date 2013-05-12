@@ -302,7 +302,7 @@
     							that.data.splice(0,1);
     							that.ChangeStatus("Decrypting...(" + Math.round((1/that.data.length)*100) + "%)");
     							Debug("Now, there's only " + that.data.length + " chunks to decrypt.");
-    							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });}, 100);
+    							setTimeout(function(){that.Worker.postMessage({password: Password.value, cmd: "decrypt", chunk: that.data[0] });}, 400);
     							}
     							else
     							{
