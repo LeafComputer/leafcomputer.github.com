@@ -244,7 +244,7 @@
 			that.data = new Array();
 		that.FileSize = 1;
 		//that.writeshift = 0;
-		that.TheFileBlob = new Blob();
+		that.TheFileBlob = undefined;
 		that.msg = TheMsg;
 		that.msg.onclick = function(event){
 		event.preventDefault();
@@ -283,7 +283,14 @@
     							Debug("Got a decrypted chunk");
     							if(that.data.length > 0)
     							{
-    							that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
+    								if(that.TheFileBlob == undefined)
+    								{
+    									that.TheFileBlob = new Blob([e.data['data']],{type: that.Filetype});
+    								}
+    								else
+    								{
+    									that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
+    								}
     							Debug("Written to a blob");
     							that.data.splice(0,1);
     							Debug("Now, there's only " + that.data.length + " chunks to decrypt.");
