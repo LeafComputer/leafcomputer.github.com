@@ -146,7 +146,7 @@
 		else
 		{
 			//Dowload Complete
-			//FSIDRedirect(TheData.Fid).conclude();
+			FSIDRedirect(TheData.Fid).conclude();
 		}
 	});
 
@@ -305,6 +305,16 @@
     							}
     							else
     							{
+    								if(that.TheFileBlob == undefined)
+    								{
+    									that.TheFileBlob = new Blob([e.data['data']],{type: that.Filetype});
+    								}
+    								else
+    								{
+    									that.TheFileBlob = new Blob([that.TheFileBlob, e.data['data']],{type: that.Filetype});
+    								}
+    								Debug("Written to a blob");
+    								that.data.splice(0,1);
     							Debug("It's decrypted!!");
     							that.ChangeStatus("Saving to computer...");
 
